@@ -20,6 +20,11 @@ import SearchingHome from "./modules/searching/pages/SearchingHome";
 // Arrays Module
 import ArraysHome from "./modules/arrays/pages/ArraysHome";
 
+// Stacks & Queues Module
+import StacksQueuesHome from "./modules/stacks-queues/pages/StacksQueuesHome";
+import StackPage from "./modules/stacks-queues/pages/StackPage";
+import QueuePage from "./modules/stacks-queues/pages/QueuePage";
+
 // Scroll Helper
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -47,6 +52,11 @@ function App() {
 
         {/* Arrays */}
         <Route path="/learn/arrays" element={<ArraysHome />} />
+
+        {/* Stacks & Queues */}
+        <Route path="/learn/stacks-queues" element={<StacksQueuesHome />} />
+        <Route path="/learn/stacks" element={<StackPage />} />
+        <Route path="/learn/queues" element={<QueuePage />} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
