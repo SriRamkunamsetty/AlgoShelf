@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, Clock3, Eye, Plus, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, Clock3, Eye, Layers, Plus, Sparkles, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "../../../components/Footer";
 import StackVisualizer from "../components/StackVisualizer";
@@ -7,19 +7,24 @@ import { stackContent } from "../data/stackContent";
 
 export default function StackPage() {
   const nextId = useRef(4);
-  const [items, setItems] = useState([
+  const maxCapacity = 6;
+
+  const [buffer, setBuffer] = useState([
     { id: "s-1", value: 12 },
     { id: "s-2", value: 45 },
     { id: "s-3", value: 89 },
+    null,
+    null,
+    null,
   ]);
+  const [top, setTop] = useState(2);
+
   const [inputValue, setInputValue] = useState("");
   const [highlightTop, setHighlightTop] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const maxCapacity = 6;
-
   const handlePush = () => {
-    if (items.length >= maxCapacity) {
+    if (top >= maxCapacity - 1) {
       setMessage({
         type: "error",
         text: `Stack Overflow! Cannot push into a full stack (Maximum capacity is ${maxCapacity}).`,
@@ -35,18 +40,24 @@ export default function StackPage() {
       return;
     }
 
+    const newTop = top + 1;
     const newItem = { id: `s-${nextId.current++}`, value: val };
-    setItems((prev) => [...prev, newItem]);
+
+    const newBuffer = [...buffer];
+    newBuffer[newTop] = newItem;
+
+    setBuffer(newBuffer);
+    setTop(newTop);
     setInputValue("");
     setHighlightTop(false);
     setMessage({
       type: "success",
-      text: `Pushed value ${val} onto the top of the stack. (Total: ${items.length + 1})`,
+      text: `Pushed value ${val} at index ${newTop} in O(1) time. Advanced top pointer to index ${newTop}.`,
     });
   };
 
   const handlePop = () => {
-    if (items.length === 0) {
+    if (top < 0) {
       setMessage({
         type: "error",
         text: "Stack Underflow! Cannot pop from an empty stack.",
@@ -54,17 +65,22 @@ export default function StackPage() {
       return;
     }
 
-    const poppedItem = items[items.length - 1];
-    setItems((prev) => prev.slice(0, -1));
+    const poppedItem = buffer[top];
+    const newBuffer = [...buffer];
+    newBuffer[top] = null;
+    const newTop = top - 1;
+
+    setBuffer(newBuffer);
+    setTop(newTop);
     setHighlightTop(false);
     setMessage({
       type: "success",
-      text: `Popped value ${poppedItem.value} from the top of the stack. (Remaining: ${items.length - 1})`,
+      text: `Popped value ${poppedItem?.value} from index ${top} in O(1) time. Decremented top pointer to index ${newTop}. (Zero array elements shifted).`,
     });
   };
 
   const handlePeek = () => {
-    if (items.length === 0) {
+    if (top < 0) {
       setMessage({
         type: "error",
         text: "Cannot peek an empty stack.",
@@ -72,20 +88,21 @@ export default function StackPage() {
       return;
     }
 
-    const topItem = items[items.length - 1];
+    const topItem = buffer[top];
     setHighlightTop(true);
     setMessage({
       type: "info",
-      text: `Peek: The top element is ${topItem.value} at index ${items.length - 1}. No elements were removed.`,
+      text: `Top element is ${topItem?.value} at index ${top} (O(1) read). Peek does not modify the stack.`,
     });
   };
 
   const handleClear = () => {
-    setItems([]);
+    setBuffer(new Array(maxCapacity).fill(null));
+    setTop(-1);
     setHighlightTop(false);
     setMessage({
       type: "info",
-      text: "Stack has been cleared.",
+      text: "Stack has been cleared. Top pointer reset to -1.",
     });
   };
 
@@ -129,19 +146,19 @@ export default function StackPage() {
                   Beginner
                 </span>
                 <span className="rounded-full border border-[#E8DDD1] bg-[#FCFBF8] px-3.5 py-1.5 font-medium text-[#8C837B]">
-                  LIFO Principle
+                  Pointer-Based LIFO
                 </span>
               </div>
             </div>
 
-            {/* Quick Intuition Card */}
+            {/* Intuition Card */}
             <div className="rounded-3xl border border-[#E8DDD1] bg-[#FCFBF8] p-7 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[#A1764E]">
                 <Sparkles size={16} />
-                LIFO Mental Model
+                Pointer-Based LIFO Mental Model
               </div>
               <p className="mt-3 text-sm leading-7 text-[#5F5952]">
-                Imagine a stack of books on a desk. You can only place a new book on top (Push), and you can only take the topmost book off (Pop). The first book placed at the bottom remains until all others are removed.
+                A stack maintains a direct pointer index to the current top item. Pushing increments the pointer and writes to that memory cell. Popping reads the cell and decrements the pointer. Because elements are accessed in-place and never shifted, all operations execute in strict O(1) time.
               </p>
             </div>
           </div>
@@ -153,7 +170,8 @@ export default function StackPage() {
         <div className="grid items-start gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           {/* Visualizer */}
           <StackVisualizer
-            items={items}
+            buffer={buffer}
+            top={top}
             maxCapacity={maxCapacity}
             highlightTop={highlightTop}
             message={message}
@@ -184,13 +202,13 @@ export default function StackPage() {
                   type="number"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="e.g. 55"
+                  placeholder="e.g. 52"
                   className="h-11 flex-1 rounded-xl border border-[#DDD2C6] bg-[#FCFBF8] px-4 font-mono text-sm outline-none transition focus:border-[#A1764E] focus:ring-2 focus:ring-[#A1764E]/20"
                 />
                 <button
                   type="button"
                   onClick={handlePush}
-                  disabled={items.length >= maxCapacity}
+                  disabled={top >= maxCapacity - 1}
                   className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-[#1F1B18] px-5 text-sm font-medium text-white transition hover:bg-[#342D28] disabled:opacity-50"
                 >
                   <Plus size={16} />
@@ -204,7 +222,7 @@ export default function StackPage() {
               <button
                 type="button"
                 onClick={handlePop}
-                disabled={items.length === 0}
+                disabled={top < 0}
                 className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-[#C87865] bg-[#FDF5F3] text-sm font-semibold text-[#8C3D2D] transition hover:bg-[#F9E8E3] disabled:opacity-40"
               >
                 <Trash2 size={16} />
@@ -214,7 +232,7 @@ export default function StackPage() {
               <button
                 type="button"
                 onClick={handlePeek}
-                disabled={items.length === 0}
+                disabled={top < 0}
                 className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-[#DDD2C6] bg-white text-sm font-semibold text-[#514940] transition hover:border-[#A1764E] hover:bg-[#FCFAF7] disabled:opacity-40"
               >
                 <Eye size={16} />
@@ -226,7 +244,7 @@ export default function StackPage() {
               <button
                 type="button"
                 onClick={handleClear}
-                disabled={items.length === 0}
+                disabled={top < 0}
                 className="text-xs font-medium text-[#8C837B] hover:text-[#A84533] transition"
               >
                 Clear entire stack
@@ -235,15 +253,21 @@ export default function StackPage() {
           </div>
         </div>
 
-        {/* Complexity & Overview Section */}
+        {/* Complexity & Comparison Section */}
         <section className="pt-8 border-t border-[#ECE3D8] space-y-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#A1764E]">
-              Complexity Analysis
-            </p>
-            <h2 className="mt-2 font-display text-4xl text-[#1F1B18]">
-              Operation Complexity
-            </h2>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#A1764E]">
+                Complexity Analysis
+              </p>
+              <h2 className="mt-2 font-display text-4xl text-[#1F1B18]">
+                Operation Complexity
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-[#D8C7B5] bg-[#FAF8F5] px-4 py-1.5 text-xs font-medium text-[#8C6B48]">
+              <Layers size={14} />
+              <span>O(1) Guaranteed via Top Pointer</span>
+            </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -260,6 +284,16 @@ export default function StackPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Deep Intuition Box */}
+          <div className="rounded-2xl border border-[#E8DDD1] bg-[#FAF8F5] p-6 space-y-2">
+            <h4 className="font-display text-lg text-[#1F1B18]">
+              Why Pointer-Based Stack achieves O(1) vs. Linear Shifting
+            </h4>
+            <p className="text-sm leading-6 text-[#6B645D]">
+              Unlike operations that insert or remove items at arbitrary array indices (which demand shifting succeeding elements in <strong>O(n)</strong> time), a stack strictly modifies only the current <code className="font-mono text-xs">top</code> position. Accessing, modifying, or clearing a single index in pre-allocated memory is direct, executing in strict <strong>O(1)</strong> constant time.
+            </p>
           </div>
         </section>
       </main>

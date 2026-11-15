@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, Clock3, Eye, Plus, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, Clock3, Eye, Plus, RotateCw, Sparkles, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "../../../components/Footer";
 import QueueVisualizer from "../components/QueueVisualizer";
@@ -7,22 +7,29 @@ import { queueContent } from "../data/queueContent";
 
 export default function QueuePage() {
   const nextId = useRef(4);
-  const [items, setItems] = useState([
+  const maxCapacity = 6;
+
+  const [buffer, setBuffer] = useState([
     { id: "q-1", value: 34 },
     { id: "q-2", value: 67 },
     { id: "q-3", value: 91 },
+    null,
+    null,
+    null,
   ]);
+  const [front, setFront] = useState(0);
+  const [rear, setRear] = useState(3);
+  const [size, setSize] = useState(3);
+
   const [inputValue, setInputValue] = useState("");
   const [highlightFront, setHighlightFront] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const maxCapacity = 6;
-
   const handleEnqueue = () => {
-    if (items.length >= maxCapacity) {
+    if (size >= maxCapacity) {
       setMessage({
         type: "error",
-        text: `Queue Overflow! Cannot enqueue into a full queue (Maximum capacity is ${maxCapacity}).`,
+        text: `Queue Overflow! Cannot enqueue into a full circular buffer (Maximum capacity is ${maxCapacity}).`,
       });
       return;
     }
@@ -36,17 +43,24 @@ export default function QueuePage() {
     }
 
     const newItem = { id: `q-${nextId.current++}`, value: val };
-    setItems((prev) => [...prev, newItem]);
+    const nextRear = (rear + 1) % maxCapacity;
+
+    const newBuffer = [...buffer];
+    newBuffer[rear] = newItem;
+
+    setBuffer(newBuffer);
+    setRear(nextRear);
+    setSize((prev) => prev + 1);
     setInputValue("");
     setHighlightFront(false);
     setMessage({
       type: "success",
-      text: `Enqueued value ${val} at the rear of the queue. (Size: ${items.length + 1})`,
+      text: `Enqueued ${val} at index ${rear} in O(1) time. Advanced rear = (${rear} + 1) % ${maxCapacity} = ${nextRear}.`,
     });
   };
 
   const handleDequeue = () => {
-    if (items.length === 0) {
+    if (size === 0) {
       setMessage({
         type: "error",
         text: "Queue Underflow! Cannot dequeue from an empty queue.",
@@ -54,17 +68,24 @@ export default function QueuePage() {
       return;
     }
 
-    const dequeuedItem = items[0];
-    setItems((prev) => prev.slice(1));
+    const dequeuedItem = buffer[front];
+    const nextFront = (front + 1) % maxCapacity;
+
+    const newBuffer = [...buffer];
+    newBuffer[front] = null;
+
+    setBuffer(newBuffer);
+    setFront(nextFront);
+    setSize((prev) => prev - 1);
     setHighlightFront(false);
     setMessage({
       type: "success",
-      text: `Dequeued value ${dequeuedItem.value} from the front of the queue. (Remaining: ${items.length - 1})`,
+      text: `Dequeued value ${dequeuedItem?.value} from index ${front} in O(1) time. Advanced front = (${front} + 1) % ${maxCapacity} = ${nextFront}. (Zero array elements shifted).`,
     });
   };
 
   const handleFront = () => {
-    if (items.length === 0) {
+    if (size === 0) {
       setMessage({
         type: "error",
         text: "Cannot inspect an empty queue.",
@@ -72,20 +93,23 @@ export default function QueuePage() {
       return;
     }
 
-    const frontItem = items[0];
+    const frontItem = buffer[front];
     setHighlightFront(true);
     setMessage({
       type: "info",
-      text: `Front element is ${frontItem.value} (index 0). It will be the next item to dequeue.`,
+      text: `Front element is ${frontItem?.value} at index ${front} (O(1) read). Next in line to dequeue.`,
     });
   };
 
   const handleClear = () => {
-    setItems([]);
+    setBuffer(new Array(maxCapacity).fill(null));
+    setFront(0);
+    setRear(0);
+    setSize(0);
     setHighlightFront(false);
     setMessage({
       type: "info",
-      text: "Queue has been cleared.",
+      text: "Queue has been cleared. All buffer slots reset in O(1) time.",
     });
   };
 
@@ -129,19 +153,19 @@ export default function QueuePage() {
                   Beginner
                 </span>
                 <span className="rounded-full border border-[#E8DDD1] bg-[#FCFBF8] px-3.5 py-1.5 font-medium text-[#8C837B]">
-                  FIFO Principle
+                  Circular Array FIFO
                 </span>
               </div>
             </div>
 
-            {/* Quick Intuition Card */}
+            {/* Mental Model Card */}
             <div className="rounded-3xl border border-[#E8DDD1] bg-[#FCFBF8] p-7 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[#A1764E]">
                 <Sparkles size={16} />
-                FIFO Mental Model
+                Circular Array Principle
               </div>
               <p className="mt-3 text-sm leading-7 text-[#5F5952]">
-                Think of a checkout queue at a bakery. The first person to arrive is the first customer served and leaves first. New customers always take their place at the back of the line.
+                In a naive array queue, dequeueing shifts all subsequent items left by one position, costing O(n) time. By wrapping front and rear pointers with modulo arithmetic (<code className="font-mono text-xs">(ptr + 1) % capacity</code>), elements remain in place and operations run in strict O(1) time.
               </p>
             </div>
           </div>
@@ -153,7 +177,10 @@ export default function QueuePage() {
         <div className="grid items-start gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           {/* Visualizer */}
           <QueueVisualizer
-            items={items}
+            buffer={buffer}
+            front={front}
+            rear={rear}
+            size={size}
             maxCapacity={maxCapacity}
             highlightFront={highlightFront}
             message={message}
@@ -190,7 +217,7 @@ export default function QueuePage() {
                 <button
                   type="button"
                   onClick={handleEnqueue}
-                  disabled={items.length >= maxCapacity}
+                  disabled={size >= maxCapacity}
                   className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-[#1F1B18] px-5 text-sm font-medium text-white transition hover:bg-[#342D28] disabled:opacity-50"
                 >
                   <Plus size={16} />
@@ -204,7 +231,7 @@ export default function QueuePage() {
               <button
                 type="button"
                 onClick={handleDequeue}
-                disabled={items.length === 0}
+                disabled={size === 0}
                 className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-[#C87865] bg-[#FDF5F3] text-sm font-semibold text-[#8C3D2D] transition hover:bg-[#F9E8E3] disabled:opacity-40"
               >
                 <Trash2 size={16} />
@@ -214,7 +241,7 @@ export default function QueuePage() {
               <button
                 type="button"
                 onClick={handleFront}
-                disabled={items.length === 0}
+                disabled={size === 0}
                 className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-[#DDD2C6] bg-white text-sm font-semibold text-[#514940] transition hover:border-[#A1764E] hover:bg-[#FCFAF7] disabled:opacity-40"
               >
                 <Eye size={16} />
@@ -226,7 +253,7 @@ export default function QueuePage() {
               <button
                 type="button"
                 onClick={handleClear}
-                disabled={items.length === 0}
+                disabled={size === 0}
                 className="text-xs font-medium text-[#8C837B] hover:text-[#A84533] transition"
               >
                 Clear entire queue
@@ -235,15 +262,21 @@ export default function QueuePage() {
           </div>
         </div>
 
-        {/* Complexity & Overview Section */}
+        {/* Complexity & Comparison Section */}
         <section className="pt-8 border-t border-[#ECE3D8] space-y-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#A1764E]">
-              Complexity Analysis
-            </p>
-            <h2 className="mt-2 font-display text-4xl text-[#1F1B18]">
-              Operation Complexity
-            </h2>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#A1764E]">
+                Complexity Analysis
+              </p>
+              <h2 className="mt-2 font-display text-4xl text-[#1F1B18]">
+                Operation Complexity
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-[#D8C7B5] bg-[#FAF8F5] px-4 py-1.5 text-xs font-medium text-[#8C6B48]">
+              <RotateCw size={14} />
+              <span>O(1) Guaranteed via Modulo Ring Buffer</span>
+            </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -260,6 +293,16 @@ export default function QueuePage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Deep Intuition Box */}
+          <div className="rounded-2xl border border-[#E8DDD1] bg-[#FAF8F5] p-6 space-y-2">
+            <h4 className="font-display text-lg text-[#1F1B18]">
+              Why Circular Array achieves O(1) vs. Naive Array O(n)
+            </h4>
+            <p className="text-sm leading-6 text-[#6B645D]">
+              In simple JavaScript array queues using <code className="font-mono text-xs">shift()</code> or array slicing, removing the first element forces every remaining item to shift left by one slot, running in <strong>O(n)</strong> time. AlgoShelf implements a true <strong>Circular Buffer</strong> with fixed capacity: both Enqueue and Dequeue only update the rear and front pointers via modulo arithmetic (<code className="font-mono text-xs">(ptr + 1) % capacity</code>), ensuring strict <strong>O(1)</strong> execution with zero element shifting.
+            </p>
           </div>
         </section>
       </main>

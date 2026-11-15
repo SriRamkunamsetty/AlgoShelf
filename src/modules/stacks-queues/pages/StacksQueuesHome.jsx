@@ -9,7 +9,7 @@ export default function StacksQueuesHome() {
       chapter: "Chapter I",
       title: "Stack (LIFO)",
       description:
-        "Last In, First Out data structure. Elements are pushed and popped exclusively from the top.",
+        "Last In, First Out data structure. Elements are pushed and popped in O(1) time using a top index pointer.",
       complexity: "O(1)",
       difficulty: "Beginner",
       path: "/learn/stacks",
@@ -18,7 +18,7 @@ export default function StacksQueuesHome() {
       chapter: "Chapter II",
       title: "Queue (FIFO)",
       description:
-        "First In, First Out data structure. Elements are enqueued at the rear and dequeued from the front.",
+        "First In, First Out data structure. Elements are enqueued and dequeued in O(1) time via circular array pointers.",
       complexity: "O(1)",
       difficulty: "Beginner",
       path: "/learn/queues",
