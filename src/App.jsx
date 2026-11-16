@@ -21,6 +21,11 @@ import LinearSearch from "./modules/searching/pages/LinearSearch";
 // Arrays Module
 import ArraysHome from "./modules/arrays/pages/ArraysHome";
 
+// Graph Module
+import GraphsHome from "./modules/graphs/pages/GraphsHome";
+import GraphTraversalPage from "./modules/graphs/pages/GraphTraversalPage";
+import DijkstraPage from "./modules/graphs/pages/DijkstraPage";
+
 // Scroll Helper
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -49,6 +54,11 @@ function App() {
 
         {/* Arrays */}
         <Route path="/learn/arrays" element={<ArraysHome />} />
+
+        {/* Graphs */}
+        <Route path="/learn/graphs" element={<GraphsHome />} />
+        <Route path="/learn/graphs/traversals" element={<GraphTraversalPage />} />
+        <Route path="/learn/graphs/dijkstra" element={<DijkstraPage />} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
