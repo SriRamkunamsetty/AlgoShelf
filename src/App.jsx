@@ -21,6 +21,11 @@ import LinearSearch from "./modules/searching/pages/LinearSearch";
 // Arrays Module
 import ArraysHome from "./modules/arrays/pages/ArraysHome";
 
+// Trees Module
+import TreesHome from "./modules/trees/pages/TreesHome";
+import BSTPage from "./modules/trees/pages/BSTPage";
+import TreeTraversalsPage from "./modules/trees/pages/TreeTraversalsPage";
+
 // Scroll Helper
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -49,6 +54,11 @@ function App() {
 
         {/* Arrays */}
         <Route path="/learn/arrays" element={<ArraysHome />} />
+
+        {/* Trees */}
+        <Route path="/learn/trees" element={<TreesHome />} />
+        <Route path="/learn/trees/bst" element={<BSTPage />} />
+        <Route path="/learn/trees/traversals" element={<TreeTraversalsPage />} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
