@@ -20,6 +20,7 @@ import LinearSearch from "./modules/searching/pages/LinearSearch";
 
 // Arrays Module
 import ArraysHome from "./modules/arrays/pages/ArraysHome";
+import ArrayOperations from "./modules/arrays/pages/ArrayOperations";
 
 // Stacks & Queues Module
 import StacksQueuesHome from "./modules/stacks-queues/pages/StacksQueuesHome";
@@ -54,6 +55,7 @@ function App() {
 
         {/* Arrays */}
         <Route path="/learn/arrays" element={<ArraysHome />} />
+        <Route path="/learn/arrays/operations" element={<ArrayOperations />} />
 
         {/* Stacks & Queues */}
         <Route path="/learn/stacks-queues" element={<StacksQueuesHome />} />
