@@ -10,7 +10,7 @@ export const queueContent = {
   },
   takeaways: [
     "Pointer Complexity O(1): Enqueue and Dequeue advance pointers via modulo math ((ptr + 1) % capacity) in O(1) time with zero element shifts.",
-    "React Buffer Note O(C): In React's immutable state paradigm, updating state clones the fixed-capacity buffer in O(C) time (where capacity C = 6).",
+    "React Buffer Note O(C): In React's declarative state paradigm, updating state creates a shallow copy of the fixed-capacity buffer in O(C) time (where capacity C = 6).",
     "Eliminates Linear Shifts: Unlike linear queue unshifting which costs O(n), circular pointer wrapping leaves existing items unmoved in memory.",
     "Fundamental for OS CPU task scheduling, ring buffers, and Breadth-First Search (BFS).",
   ],
@@ -18,12 +18,12 @@ export const queueContent = {
     {
       name: "Enqueue(x)",
       complexity: "O(1)*",
-      desc: "Places element x at buffer[rear] and advances rear = (rear + 1) % capacity in O(1) pointer time (*O(C) shallow clone for React state updates, where C = 6).",
+      desc: "Places element x at buffer[rear] and advances rear = (rear + 1) % capacity in O(1) pointer time (*O(C) shallow buffer copy for React state updates, where C = 6).",
     },
     {
       name: "Dequeue()",
       complexity: "O(1)*",
-      desc: "Reads buffer[front], clears slot, and advances front = (front + 1) % capacity in O(1) pointer time (*O(C) shallow clone for React state updates, where C = 6).",
+      desc: "Reads buffer[front], clears slot in-place, and advances front = (front + 1) % capacity in O(1) pointer time (*O(C) shallow buffer copy for React state updates, where C = 6).",
     },
     {
       name: "Front()",
