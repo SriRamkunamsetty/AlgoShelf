@@ -20,6 +20,7 @@ import LinearSearch from "./modules/searching/pages/LinearSearch";
 
 // Arrays Module
 import ArraysHome from "./modules/arrays/pages/ArraysHome";
+import ArrayOperations from "./modules/arrays/pages/ArrayOperations";
 
 // Linked List Module
 import LinkedListHome from "./modules/linked-list/pages/LinkedListHome";
@@ -53,6 +54,7 @@ function App() {
 
         {/* Arrays */}
         <Route path="/learn/arrays" element={<ArraysHome />} />
+        <Route path="/learn/arrays/operations" element={<ArrayOperations />} />
 
         {/* Linked Lists */}
         <Route path="/learn/linked-lists" element={<LinkedListHome />} />
