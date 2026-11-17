@@ -20,6 +20,7 @@ import LinearSearch from "./modules/searching/pages/LinearSearch";
 
 // Arrays Module
 import ArraysHome from "./modules/arrays/pages/ArraysHome";
+import ArrayOperations from "./modules/arrays/pages/ArrayOperations";
 
 // Trees Module
 import TreesHome from "./modules/trees/pages/TreesHome";
@@ -54,6 +55,7 @@ function App() {
 
         {/* Arrays */}
         <Route path="/learn/arrays" element={<ArraysHome />} />
+        <Route path="/learn/arrays/operations" element={<ArrayOperations />} />
 
         {/* Trees */}
         <Route path="/learn/trees" element={<TreesHome />} />
