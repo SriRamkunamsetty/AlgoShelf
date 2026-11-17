@@ -55,7 +55,7 @@ export default function QueuePage() {
     setHighlightFront(false);
     setMessage({
       type: "success",
-      text: `Enqueued ${val} at index ${rear} in O(1) time. Advanced rear = (${rear} + 1) % ${maxCapacity} = ${nextRear}.`,
+      text: `Enqueued ${val} at index ${rear} (O(1) pointer update; O(C) React buffer copy). Advanced rear = (${rear} + 1) % ${maxCapacity} = ${nextRear}.`,
     });
   };
 
@@ -80,7 +80,7 @@ export default function QueuePage() {
     setHighlightFront(false);
     setMessage({
       type: "success",
-      text: `Dequeued value ${dequeuedItem?.value} from index ${front} in O(1) time. Advanced front = (${front} + 1) % ${maxCapacity} = ${nextFront}. (Zero array elements shifted).`,
+      text: `Dequeued value ${dequeuedItem?.value} from index ${front} (O(1) pointer update; O(C) React buffer copy). Advanced front = (${front} + 1) % ${maxCapacity} = ${nextFront}. (Zero array elements shifted).`,
     });
   };
 
@@ -296,12 +296,15 @@ export default function QueuePage() {
           </div>
 
           {/* Deep Intuition Box */}
-          <div className="rounded-2xl border border-[#E8DDD1] bg-[#FAF8F5] p-6 space-y-2">
+          <div className="rounded-2xl border border-[#E8DDD1] bg-[#FAF8F5] p-6 space-y-3">
             <h4 className="font-display text-lg text-[#1F1B18]">
-              Why Circular Array achieves O(1) vs. Naive Array O(n)
+              Why Circular Array achieves O(1) Algorithmic Time vs. O(C) React Rendering Copy
             </h4>
             <p className="text-sm leading-6 text-[#6B645D]">
-              In simple JavaScript array queues using <code className="font-mono text-xs">shift()</code> or array slicing, removing the first element forces every remaining item to shift left by one slot, running in <strong>O(n)</strong> time. AlgoShelf implements a true <strong>Circular Buffer</strong> with fixed capacity: both Enqueue and Dequeue only update the rear and front pointers via modulo arithmetic (<code className="font-mono text-xs">(ptr + 1) % capacity</code>), ensuring strict <strong>O(1)</strong> execution with zero element shifting.
+              In low-level systems (C/C++ and OS circular ring buffers), Enqueue and Dequeue only update the integer pointers via modulo arithmetic (<code className="font-mono text-xs">(ptr + 1) % capacity</code>) and write directly to the slot, executing in strict <strong>O(1)</strong> time with zero element shifting.
+            </p>
+            <p className="text-sm leading-6 text-[#6B645D]">
+              In React&apos;s UI state paradigm, updating state safely requires creating an immutable snapshot (<code className="font-mono text-xs">[...buffer]</code>) taking <strong>O(C)</strong> time where <code className="font-mono text-xs">C = 6</code> is the fixed capacity. While React copies the buffer to trigger re-renders, the underlying circular queue algorithm remains strictly <strong>O(1)</strong> with zero element shifts.
             </p>
           </div>
         </section>

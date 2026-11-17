@@ -52,7 +52,7 @@ export default function StackPage() {
     setHighlightTop(false);
     setMessage({
       type: "success",
-      text: `Pushed value ${val} at index ${newTop} in O(1) time. Advanced top pointer to index ${newTop}.`,
+      text: `Pushed value ${val} at index ${newTop} (O(1) pointer update; O(C) React buffer copy). Advanced top pointer to index ${newTop}.`,
     });
   };
 
@@ -75,7 +75,7 @@ export default function StackPage() {
     setHighlightTop(false);
     setMessage({
       type: "success",
-      text: `Popped value ${poppedItem?.value} from index ${top} in O(1) time. Decremented top pointer to index ${newTop}. (Zero array elements shifted).`,
+      text: `Popped value ${poppedItem?.value} from index ${top} (O(1) pointer update; O(C) React buffer copy). Decremented top pointer to index ${newTop}. (Zero array elements shifted).`,
     });
   };
 
@@ -287,12 +287,15 @@ export default function StackPage() {
           </div>
 
           {/* Deep Intuition Box */}
-          <div className="rounded-2xl border border-[#E8DDD1] bg-[#FAF8F5] p-6 space-y-2">
+          <div className="rounded-2xl border border-[#E8DDD1] bg-[#FAF8F5] p-6 space-y-3">
             <h4 className="font-display text-lg text-[#1F1B18]">
-              Why Pointer-Based Stack achieves O(1) vs. Linear Shifting
+              Why Pointer-Based Stack achieves O(1) Algorithmic Time vs. O(C) React Rendering Copy
             </h4>
             <p className="text-sm leading-6 text-[#6B645D]">
-              Unlike operations that insert or remove items at arbitrary array indices (which demand shifting succeeding elements in <strong>O(n)</strong> time), a stack strictly modifies only the current <code className="font-mono text-xs">top</code> position. Accessing, modifying, or clearing a single index in pre-allocated memory is direct, executing in strict <strong>O(1)</strong> constant time.
+              In low-level systems (C/C++ and native hardware architectures), a Stack strictly writes or deletes at the pre-allocated memory index <code className="font-mono text-xs">buffer[top]</code> and updates the integer pointer, executing in genuine <strong>O(1)</strong> constant time with zero element shifting.
+            </p>
+            <p className="text-sm leading-6 text-[#6B645D]">
+              In React&apos;s UI state paradigm, updating state safely requires a shallow clone of the fixed buffer array (<code className="font-mono text-xs">[...buffer]</code>), which executes in <strong>O(C)</strong> time where <code className="font-mono text-xs">C = 6</code> is the fixed capacity. While React creates an immutable state snapshot for re-rendering, the core data structure mechanics remain strictly <strong>O(1)</strong> with zero elements shifted.
             </p>
           </div>
         </section>
