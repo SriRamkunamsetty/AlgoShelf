@@ -27,6 +27,10 @@ import StacksQueuesHome from "./modules/stacks-queues/pages/StacksQueuesHome";
 import StackPage from "./modules/stacks-queues/pages/StackPage";
 import QueuePage from "./modules/stacks-queues/pages/QueuePage";
 
+// Linked List Module
+import LinkedListHome from "./modules/linked-list/pages/LinkedListHome";
+import LinkedListPage from "./modules/linked-list/pages/LinkedListPage";
+
 // Scroll Helper
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -62,6 +66,12 @@ function App() {
         <Route path="/learn/stacks" element={<StackPage />} />
         <Route path="/learn/queues" element={<QueuePage />} />
 
+        {/* Linked Lists */}
+        <Route path="/learn/linked-list" element={<LinkedListHome />} />
+        <Route path="/learn/linked-list/operations" element={<LinkedListPage />} />
+        <Route path="/linked-list" element={<LinkedListHome />} />
+        <Route path="/linked-list/operations" element={<LinkedListPage />} />
+
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -69,6 +79,4 @@ function App() {
   );
 }
 
-
 export default App;
-
