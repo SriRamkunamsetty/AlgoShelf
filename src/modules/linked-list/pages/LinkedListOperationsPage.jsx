@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "../../../components/Footer";
-import LinkedListVisualizer from "../components/LinkedListVisualizer";
+import SinglyLinkedListVisualizer from "../components/SinglyLinkedListVisualizer";
 import { linkedListContent } from "../data/linkedListContent";
 import {
   createInitialList,
@@ -60,6 +60,7 @@ export default function LinkedListOperationsPage() {
   useEffect(() => {
     if (isPlaying) {
       playTimerRef.current = setTimeout(() => {
+        playTimerRef.current = null;
         if (currentStepIndex < steps.length - 1) {
           setCurrentStepIndex((prev) => prev + 1);
         } else {
@@ -71,6 +72,7 @@ export default function LinkedListOperationsPage() {
     return () => {
       if (playTimerRef.current) {
         clearTimeout(playTimerRef.current);
+        playTimerRef.current = null;
       }
     };
   }, [isPlaying, currentStepIndex, steps.length, speedMs]);
@@ -79,6 +81,8 @@ export default function LinkedListOperationsPage() {
     stopPlayback();
     if (!opResult.success) {
       setMessage({ type: "error", text: opResult.message });
+      setSteps([]);
+      setCurrentStepIndex(-1);
       return;
     }
 
@@ -90,50 +94,68 @@ export default function LinkedListOperationsPage() {
   };
 
   const handleInsertHead = () => {
-    if (!insertVal.trim() || isNaN(Number(insertVal))) {
+    const val = Number(insertVal);
+    if (!insertVal.trim() || !Number.isFinite(val)) {
       setMessage({
         type: "error",
         text: "Please enter a valid numeric value to insert.",
       });
+      setSteps([]);
+      setCurrentStepIndex(-1);
       return;
     }
-    const res = insertBeginning(list, Number(insertVal));
+    const res = insertBeginning(list, val);
     runOperation(res, "Insert at Beginning (Head)");
-    setInsertVal("");
+    if (res.success) {
+      setInsertVal("");
+    }
   };
 
   const handleInsertTail = () => {
-    if (!insertVal.trim() || isNaN(Number(insertVal))) {
+    const val = Number(insertVal);
+    if (!insertVal.trim() || !Number.isFinite(val)) {
       setMessage({
         type: "error",
         text: "Please enter a valid numeric value to insert.",
       });
+      setSteps([]);
+      setCurrentStepIndex(-1);
       return;
     }
-    const res = insertEnd(list, Number(insertVal));
+    const res = insertEnd(list, val);
     runOperation(res, "Insert at End (Tail)");
-    setInsertVal("");
+    if (res.success) {
+      setInsertVal("");
+    }
   };
 
   const handleInsertAtPosition = () => {
-    if (!insertVal.trim() || isNaN(Number(insertVal))) {
+    const val = Number(insertVal);
+    if (!insertVal.trim() || !Number.isFinite(val)) {
       setMessage({
         type: "error",
         text: "Please enter a valid numeric value to insert.",
       });
+      setSteps([]);
+      setCurrentStepIndex(-1);
       return;
     }
     const pos = Number(insertPos);
-    if (isNaN(pos) || pos < 0 || pos > list.length) {
+    if (!insertPos.trim() || !Number.isInteger(pos) || pos < 0 || pos > list.length) {
       setMessage({
         type: "error",
-        text: `Position must be between 0 and ${list.length}.`,
+        text: `Position must be an integer between 0 and ${list.length}.`,
       });
+      setSteps([]);
+      setCurrentStepIndex(-1);
       return;
     }
-    const res = insertAtPosition(list, Number(insertVal), pos);
+    const res = insertAtPosition(list, val, pos);
     runOperation(res, "Insert at Position (k)");
-    setInsertVal("");
+    if (res.success) {
+      setInsertVal("");
+      setInsertPos("");
+    }
   };
 
   const handleDeleteHead = () => {
@@ -148,18 +170,28 @@ export default function LinkedListOperationsPage() {
 
   const handleDeleteAtPosition = () => {
     const pos = Number(deletePos);
-    if (isNaN(pos) || pos < 0 || pos >= list.length) {
+    if (
+      !deletePos.trim() ||
+      !Number.isInteger(pos) ||
+      pos < 0 ||
+      pos >= list.length
+    ) {
       setMessage({
         type: "error",
-        text: `Position must be between 0 and ${Math.max(
+        text: `Position must be an integer between 0 and ${Math.max(
           0,
           list.length - 1
         )}.`,
       });
+      setSteps([]);
+      setCurrentStepIndex(-1);
       return;
     }
     const res = deleteAtPosition(list, pos);
     runOperation(res, "Delete from Position (k)");
+    if (res.success) {
+      setDeletePos("");
+    }
   };
 
   const handleResetList = () => {
@@ -252,7 +284,7 @@ export default function LinkedListOperationsPage() {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Left Visualizer & Control Panels (2 Columns) */}
           <div className="space-y-6 lg:col-span-2">
-            <LinkedListVisualizer
+            <SinglyLinkedListVisualizer
               list={activeDisplayList}
               highlightIndex={highlightIndex}
               relinkIndex={relinkIndex}
@@ -469,11 +501,14 @@ export default function LinkedListOperationsPage() {
                   Complexity
                 </h4>
                 <div className="mt-2 rounded-xl border border-[#E8DDD1] bg-[#FCFBF8] p-3 text-center">
-                  <span className="block text-[10px] text-[#8C837B]">
-                    Time Complexity
+                  <span className="block text-[10px] uppercase tracking-wider text-[#8C837B]">
+                    Theoretical Algorithmic Time
                   </span>
                   <span className="font-mono text-base font-bold text-[#3D5A37]">
                     {currentOpInfo.complexity}
+                  </span>
+                  <span className="mt-1 block text-[10px] text-[#8C837B]">
+                    (Theoretical pointer updates; JavaScript simulation copies array state immutably)
                   </span>
                 </div>
               </div>

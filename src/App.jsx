@@ -24,6 +24,7 @@ import ArrayOperations from "./modules/arrays/pages/ArrayOperations";
 
 // Linked List Module
 import LinkedListHome from "./modules/linked-list/pages/LinkedListHome";
+import LinkedListPage from "./modules/linked-list/pages/LinkedListPage";
 import LinkedListOperationsPage from "./modules/linked-list/pages/LinkedListOperationsPage";
 
 // Scroll Helper
@@ -57,11 +58,13 @@ function App() {
         <Route path="/learn/arrays/operations" element={<ArrayOperations />} />
 
         {/* Linked Lists */}
+        <Route path="/learn/linked-list" element={<LinkedListHome />} />
+        <Route path="/learn/linked-list/operations" element={<LinkedListPage />} />
+        <Route path="/learn/linked-list/advanced-operations" element={<LinkedListOperationsPage />} />
+        <Route path="/linked-list" element={<LinkedListHome />} />
+        <Route path="/linked-list/operations" element={<LinkedListPage />} />
         <Route path="/learn/linked-lists" element={<LinkedListHome />} />
-        <Route
-          path="/learn/linked-lists/operations"
-          element={<LinkedListOperationsPage />}
-        />
+        <Route path="/learn/linked-lists/operations" element={<LinkedListOperationsPage />} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
@@ -70,6 +73,4 @@ function App() {
   );
 }
 
-
 export default App;
-
