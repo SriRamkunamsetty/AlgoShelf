@@ -27,6 +27,10 @@ import TreesHome from "./modules/trees/pages/TreesHome";
 import BSTPage from "./modules/trees/pages/BSTPage";
 import TreeTraversalsPage from "./modules/trees/pages/TreeTraversalsPage";
 
+// Linked List Module
+import LinkedListHome from "./modules/linked-list/pages/LinkedListHome";
+import LinkedListPage from "./modules/linked-list/pages/LinkedListPage";
+
 // Scroll Helper
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -62,6 +66,12 @@ function App() {
         <Route path="/learn/trees/bst" element={<BSTPage />} />
         <Route path="/learn/trees/traversals" element={<TreeTraversalsPage />} />
 
+        {/* Linked Lists */}
+        <Route path="/learn/linked-list" element={<LinkedListHome />} />
+        <Route path="/learn/linked-list/operations" element={<LinkedListPage />} />
+        <Route path="/linked-list" element={<LinkedListHome />} />
+        <Route path="/linked-list/operations" element={<LinkedListPage />} />
+
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -69,6 +79,4 @@ function App() {
   );
 }
 
-
 export default App;
-
